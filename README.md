@@ -3,6 +3,12 @@ A sleek and modern React weather application that fetches and displays real-time
 
 🔗 Live Demo: weather-app-three-ecru-shfy65h20j.vercel.app
 
+1.where temp is >16 degree
+![image](https://github.com/user-attachments/assets/436bc3ab-56d9-4e8f-9b9b-bdcfb7404f9f)
+
+
+2. where temp is <16 degree
+   ![image](https://github.com/user-attachments/assets/026f36a3-7438-48e3-b5b8-d92ad8a1f057)
 
 🚀 Features
 🔍 Search weather by city
@@ -24,27 +30,8 @@ CSS – Custom styles with blur and shadow effects
 
 OpenWeatherMap API – For weather data
 
-🧰 Installation
-bash
-Copy code
-git clone https://github.com/your-username/weather-app.git
-cd weather-app
-npm install
-npm start
-🔐 API Configuration
-Sign up at OpenWeatherMap to get your API key.
 
-Replace the placeholder in your project:
-
-js
-Copy code
-const api = {
-  key: "YOUR_API_KEY_HERE",
-  base: "https://api.openweathermap.org/data/2.5/",
-};
 📁 Folder Structure
-pgsql
-Copy code
 weather-app/
 ├── public/
 │   └── index.html
