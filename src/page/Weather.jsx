@@ -1,113 +1,110 @@
-import React, { useState } from "react";
-import './Weather.css'
-// New Date() => current date complete
-// new Date().getDate()  => wed= index value 3
+// ✅ Full React Component with Extra Weather Info and Comments
+import React, { useState, useEffect } from "react";
+import './Weather.css'; // Import custom styles
 
+// ✅ API configuration
 const api = {
   key: "7958f35ee93285a11fb80e06a9e3a6a6",
   base: "https://api.openweathermap.org/data/2.5/",
 };
 
 const Weather = () => {
-  const [query, setQuery] = useState("");
-  const [weather, setWeather] = useState({});
-  const [error, setError] = useState(""); // error message
+  const [query, setQuery] = useState(""); // user input
+  const [weather, setWeather] = useState({}); // weather data from API
+  const [error, setError] = useState(""); // error message if city not found
 
-  // search operation
+  // ✅ Fetch default weather (Mohali) on initial load
+  useEffect(() => {
+    fetch(`${api.base}weather?q=Mohali,in&units=metric&APPID=${api.key}`)
+      .then((res) => res.json())
+      .then((result) => {
+        setWeather(result);
+        console.log("Default Mohali Weather:", result);
+      });
+  }, []);
+
+  // ✅ Handle search on Enter key press
   const search = (evt) => {
-    // console.log(evt)
     if (evt.key === "Enter") {
       fetch(`${api.base}weather?q=${query}&units=metric&APPID=${api.key}`)
-        // result in json
         .then((res) => res.json())
         .then((result) => {
           if (result.cod === "404") {
-            // if city not found
             setWeather({});
             setError("City not found. Please try again.");
           } else {
             setWeather(result);
-            // data console of weather
             setQuery("");
-            setError(""); // clear previous error
-            console.log(result);
+            setError("");
           }
         });
     }
   };
 
+  // ✅ Format date
   const dateBuilder = (d) => {
-    let months = [
-      "Januray", // typo kept as in original comment
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December",
     ];
-    let days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thusday", // typo kept as in original comment
-      "Friday",
-      "Saturday",
+    const days = [
+      "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
     ];
-
-    let day = days[d.getDay()];
-    let date = d.getDate();
-    let month = months[d.getMonth()];
-    let year = d.getFullYear();
+    const day = days[d.getDay()];
+    const date = d.getDate();
+    const month = months[d.getMonth()];
+    const year = d.getFullYear();
 
     return `${day} ${date} ${month} ${year}`;
   };
 
   return (
     <div className={
-      // temp > 16 ? summer image, else winter image; default = warm
       typeof weather.main !== "undefined"
         ? (weather.main.temp > 16 ? "app warm" : "app")
         : "app warm"
     }>
       <main>
+        {/* ✅ Search input */}
         <div className="search-box">
           <input
             type="text"
             className="search-bar"
-            placeholder="Search..."
+            placeholder="Search city..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyPress={search}
           />
         </div>
 
-        {/* error message if city not found */}
+        {/* ✅ Error message display */}
         {error && <div className="error-message">{error}</div>}
 
-        {(typeof weather.main !== "undefined") ? (
+        {/* ✅ Display weather info */}
+        {typeof weather.main !== "undefined" && !error && (
           <div>
             <div className="location-box">
               <div className="location">
-                {/* // city name */}
-                {weather.name},
-                {/* // country name */}
-                {weather.sys.country}
+                {weather.name}, {weather.sys.country}
               </div>
               <div className="date">{dateBuilder(new Date())}</div>
-              <div className="weather-box">
-                <div className="temp">{Math.round(weather.main.temp)}°C</div>
-                <div className="weather">{weather.weather[0].main}</div>
+            </div>
+
+            <div className="weather-box">
+              <div className="temp">{Math.round(weather.main.temp)}°C</div>
+              <div className="weather">{weather.weather[0].main}</div>
+
+              {/* ✅ Extra interactive data */}
+              <div className="extras">
+                <p>Feels Like: {Math.round(weather.main.feels_like)}°C</p>
+                <p>Humidity: {weather.main.humidity}%</p>
+                <p>Wind Speed: {weather.wind.speed} m/s</p>
+                <p>Cloudiness: {weather.clouds.all}%</p>
+                <p>Description: {weather.weather[0].description}</p>
               </div>
             </div>
           </div>
-        ) : ("")}
+        )}
       </main>
     </div>
   );
