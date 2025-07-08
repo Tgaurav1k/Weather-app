@@ -7,29 +7,38 @@ const api = {
   key: "7958f35ee93285a11fb80e06a9e3a6a6",
   base: "https://api.openweathermap.org/data/2.5/",
 };
+
 const Weather = () => {
   const [query, setQuery] = useState("");
   const [weather, setWeather] = useState({});
+  const [error, setError] = useState(""); // error message
 
   // search operation
   const search = (evt) => {
     // console.log(evt)
     if (evt.key === "Enter") {
       fetch(`${api.base}weather?q=${query}&units=metric&APPID=${api.key}`)
-        // result i json
+        // result in json
         .then((res) => res.json())
         .then((result) => {
-          setWeather(result);
-          // data console of weather
-          setQuery("");
-          console.log(result);
+          if (result.cod === "404") {
+            // if city not found
+            setWeather({});
+            setError("City not found. Please try again.");
+          } else {
+            setWeather(result);
+            // data console of weather
+            setQuery("");
+            setError(""); // clear previous error
+            console.log(result);
+          }
         });
     }
   };
 
   const dateBuilder = (d) => {
     let months = [
-      "Januray",
+      "Januray", // typo kept as in original comment
       "February",
       "March",
       "April",
@@ -47,7 +56,7 @@ const Weather = () => {
       "Monday",
       "Tuesday",
       "Wednesday",
-      "Thusday",
+      "Thusday", // typo kept as in original comment
       "Friday",
       "Saturday",
     ];
@@ -61,7 +70,12 @@ const Weather = () => {
   };
 
   return (
-    <div className={(typeof weather.main !="undefined")?((weather.main.temp >16)?"app warm" :"app" ):'app'} >
+    <div className={
+      // temp > 16 ? summer image, else winter image; default = warm
+      typeof weather.main !== "undefined"
+        ? (weather.main.temp > 16 ? "app warm" : "app")
+        : "app warm"
+    }>
       <main>
         <div className="search-box">
           <input
@@ -73,23 +87,26 @@ const Weather = () => {
             onKeyPress={search}
           />
         </div>
-        {(typeof weather.main !="undefined")?(
-        <div>
-          <div className="location-box">
-            <div className="location">
-              {/* // city name */}
-              {weather.name}, 
-              {/* // country name */}
-              {weather.sys.country}
-            </div>
-            <div className="date">{dateBuilder(new Date())}</div>
-            <div className="weather-box">
-              <div className="temp">{Math.round(weather.main.temp)}°C</div>
-              <div className="weather" >{weather.weather[0].main}</div>
+
+        {/* error message if city not found */}
+        {error && <div className="error-message">{error}</div>}
+
+        {(typeof weather.main !== "undefined") ? (
+          <div>
+            <div className="location-box">
+              <div className="location">
+                {/* // city name */}
+                {weather.name},
+                {/* // country name */}
+                {weather.sys.country}
+              </div>
+              <div className="date">{dateBuilder(new Date())}</div>
+              <div className="weather-box">
+                <div className="temp">{Math.round(weather.main.temp)}°C</div>
+                <div className="weather">{weather.weather[0].main}</div>
+              </div>
             </div>
           </div>
-        </div>
-
         ) : ("")}
       </main>
     </div>
